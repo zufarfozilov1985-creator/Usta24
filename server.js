@@ -38,7 +38,7 @@ function tokenTekshir(req, res, keyingi) {
 app.get('/salomatlik', async (req, res) => {
   try {
     await pool.query('SELECT 1');
-    res.json({ holat: 'yaxshi', db: 'ulangan', server: 'Usta24.uz', versiya: '1.0.0' });
+    res.json({ holat: 'yaxshi', db: 'ulangan', server: 'Yechim24.uz', versiya: '1.0.0' });
   } catch (x) { res.status(500).json({ holat: 'xato', xabar: x.message }); }
 });
 
@@ -236,16 +236,7 @@ app.post('/api/tolov/click/complete', async (req, res) => {
 });
 
 app.use(function(x, req, res, next) { res.status(500).json({ xato: x.message }); });
-app.get('/api/test-token', async (req, res) => {
-  const token = jwt.sign(
-    { id: '11111111-1111-1111-1111-111111111111', telefon: '+998901234567', rol: 'mijoz' },
-    JWT_SECRET,
-    { expiresIn: '7d' }
-  );
-  res.json({ token });
-});
-
 
 app.listen(PORT, function() {
-  console.log('Usta24.uz server ' + PORT + '-portda ishlamoqda');
+  console.log('Yechim24.uz server ' + PORT + '-portda ishlamoqda');
 });

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="description" content="Usta24.uz — O'zbekistoning eng yaxshi ustalar va qurilish materiallari platformasi">
-<title>Usta24.uz — Usta toping</title>
+<meta name="description" content="Yechim24.uz — O'zbekistoning eng yaxshi ustalar va qurilish materiallari platformasi">
+<title>Yechim24.uz — Usta toping</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -618,7 +618,7 @@ async function elonlarniYukla(){
   konteyner.innerHTML='<div style="text-align:center;padding:40px;color:var(--matn-och)"><div style="font-size:36px;margin-bottom:8px">⏳</div><div>Yuklanmoqda...</div></div>';
   try{
     const url=joriyElonFiltir==='barchasi'?'/api/elonlar':`/api/elonlar?kategoriya=${joriyElonFiltir}`;
-    const r=await fetch('https://usta24.onrender.com'+url);
+    const r=await fetch('http://localhost:5000'+url);
     const data=await r.json();
     document.getElementById('elonlar-soni').textContent=data.jami;
     if(!data.malumotlar.length){
@@ -713,7 +713,7 @@ async function taklifYuborish(){
   if(!matn){document.getElementById('t-matn').style.borderColor='#E24B4A';return;}
   try{
     const token=localStorage.getItem('token');
-    const r=await fetch(`https://usta24.onrender.com/api/elonlar/${taklifYuboriladiganElon.id}/taklif`,{
+    const r=await fetch(`http://localhost:5000/api/elonlar/${taklifYuboriladiganElon.id}/taklif`,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
       body:JSON.stringify({matn,taklif_narx:narx?parseInt(narx):null})
