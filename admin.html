@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yechim24.uz — Admin Panel</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#F5F6FA;color:#2D3748}
+.wrap{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:#fff;border-right:1px solid #E8ECF2;display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100}
+.brand{padding:20px 16px;border-bottom:1px solid #E8ECF2}
+.brand-nom{font-size:18px;font-weight:600;color:#1A1A2E}
+.brand-nom span{color:#0ABF6F}
+.brand-sub{font-size:12px;color:#718096;margin-top:2px}
+.nav{padding:8px 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:14px;color:#718096;border-left:3px solid transparent;transition:all 0.15s;text-decoration:none}
+.nav-item:hover{background:#F5F6FA;color:#2D3748}
+.nav-item.faol{color:#0ABF6F;border-left-color:#0ABF6F;background:#E8FBF1;font-weight:500}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.sidebar-pastki{padding:16px;border-top:1px solid #E8ECF2}
+.chiqish-btn{display:flex;align-items:center;gap:8px;font-size:13px;color:#718096;cursor:pointer;padding:8px;border-radius:8px;transition:all 0.15s}
+.chiqish-btn:hover{background:#F5F6FA;color:#E24B4A}
+
+/* ASOSIY */
+.main{flex:1;margin-left:220px;padding:24px}
+.sahifa-sarlavha{font-size:20px;font-weight:600;color:#1A1A2E;margin-bottom:20px}
+
+/* STATISTIKA */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-karta{background:#fff;border:1px solid #E8ECF2;border-radius:12px;padding:16px}
+.stat-label{font-size:12px;color:#718096;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.stat-raqam{font-size:24px;font-weight:600;color:#1A1A2E}
+.stat-ozg{font-size:12px;margin-top:4px}
+.osish{color:#0ABF6F}
+.tushish{color:#E24B4A}
+
+/* JADVAL */
+.jadval-wrap{background:#fff;border:1px solid #E8ECF2;border-radius:12px;overflow:hidden;margin-bottom:20px}
+.jadval-top{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #E8ECF2}
+.jadval-nom{font-size:15px;font-weight:600;color:#1A1A2E}
+.qidiruv-inp{padding:8px 12px;border:1px solid #E8ECF2;border-radius:8px;font-size:13px;color:#2D3748;outline:none;width:200px;transition:border-color 0.2s}
+.qidiruv-inp:focus{border-color:#0ABF6F}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:600;color:#718096;text-transform:uppercase;letter-spacing:0.4px;padding:12px 20px;text-align:left;border-bottom:1px solid #E8ECF2;background:#FAFAFA}
+td{padding:12px 20px;font-size:13px;color:#2D3748;border-bottom:1px solid #F0F2F5}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFCFF}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.b-yashil{background:#E8FBF1;color:#0F6E56}
+.b-sariq{background:#FFF8E7;color:#7A5300}
+.b-qizil{background:#FEECEC;color:#A32D2D}
+.b-kulrang{background:#F5F6FA;color:#718096}
+.b-kovoq{background:#EFF6FF;color:#1D4ED8}
+.amal-btn{padding:5px 12px;border:1px solid #E8ECF2;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;background:#fff;color:#718096;margin-right:4px;transition:all 0.15s}
+.amal-btn:hover{background:#F5F6FA}
+.amal-btn.yashil{color:#0ABF6F;border-color:#0ABF6F}
+.amal-btn.yashil:hover{background:#E8FBF1}
+.amal-btn.qizil{color:#E24B4A;border-color:#E24B4A}
+.amal-btn.qizil:hover{background:#FEECEC}
+.avatar{width:32px;height:32px;border-radius:50%;background:#E8FBF1;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#0F6E56;margin-right:8px;vertical-align:middle}
+
+/* GRAFIK */
+.grafik-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+.grafik-karta{background:#fff;border:1px solid #E8ECF2;border-radius:12px;padding:16px}
+.grafik-sarlavha{font-size:14px;font-weight:600;color:#1A1A2E;margin-bottom:16px}
+.bar-container{display:flex;flex-direction:column;gap:8px}
+.bar-qator{display:flex;align-items:center;gap:10px}
+.bar-nom{font-size:12px;color:#718096;width:80px;flex-shrink:0;text-align:right}
+.bar-wrap{flex:1;background:#F5F6FA;border-radius:4px;height:20px;position:relative}
+.bar-ich{height:100%;border-radius:4px;background:#0ABF6F;transition:width 0.5s ease}
+.bar-val{font-size:12px;color:#2D3748;width:60px;text-align:right}
+.donut-wrap{display:flex;flex-direction:column;gap:8px}
+.donut-item{display:flex;align-items:center;justify-content:space-between}
+.donut-rang{width:12px;height:12px;border-radius:50%;margin-right:8px;flex-shrink:0}
+.donut-nom{font-size:13px;color:#2D3748;flex:1}
+.donut-foiz{font-size:13px;font-weight:600;color:#1A1A2E}
+
+/* SOZLAMALAR */
+.sozlama-grup{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #E8ECF2}
+.sozlama-nom{font-size:14px;font-weight:600;color:#1A1A2E;margin-bottom:4px}
+.sozlama-tavsif{font-size:12px;color:#718096;margin-bottom:10px}
+.sozlama-input{padding:10px 14px;border:1px solid #E8ECF2;border-radius:8px;font-size:14px;color:#2D3748;outline:none;transition:border-color 0.2s}
+.sozlama-input:focus{border-color:#0ABF6F}
+.saqlash-btn{padding:10px 24px;background:#0ABF6F;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.saqlash-btn:hover{background:#08A35E}
+
+/* KIRISH EKRANI */
+.kirish-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F5F6FA}
+.kirish-karta{background:#fff;border:1px solid #E8ECF2;border-radius:16px;padding:40px;width:400px;box-shadow:0 4px 24px rgba(0,0,0,0.06)}
+.kirish-logo{font-size:24px;font-weight:700;color:#1A1A2E;margin-bottom:4px}
+.kirish-logo span{color:#0ABF6F}
+.kirish-sub{font-size:14px;color:#718096;margin-bottom:28px}
+.kirish-label{font-size:13px;font-weight:600;color:#2D3748;margin-bottom:6px;display:block}
+.kirish-input{width:100%;padding:12px 14px;border:1px solid #E8ECF2;border-radius:8px;font-size:14px;color:#2D3748;outline:none;margin-bottom:14px;transition:border-color 0.2s}
+.kirish-input:focus{border-color:#0ABF6F}
+.kirish-btn{width:100%;padding:13px;background:#0ABF6F;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.kirish-btn:hover{background:#08A35E}
+.kirish-xato{color:#E24B4A;font-size:13px;margin-bottom:12px;display:none}
+
+/* BILDIRISHNOMA */
+.bildirish{position:fixed;top:20px;right:20px;background:#1A1A2E;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;z-index:1000;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.bildirish.korinadi{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- BILDIRISHNOMA -->
+<div class="bildirish" id="bildirish"></div>
+
+<!-- KIRISH EKRANI -->
+<div class="kirish-wrap" id="kirish-ekran">
+  <div class="kirish-karta">
+    <div class="kirish-logo">Yechim<span>24</span>.uz</div>
+    <div class="kirish-sub">Admin panelga kirish</div>
+    <div class="kirish-xato" id="kirish-xato">Login yoki parol noto'g'ri!</div>
+    <label class="kirish-label">Login</label>
+    <input class="kirish-input" type="text" id="kirish-login" placeholder="admin" value="admin">
+    <label class="kirish-label">Parol</label>
+    <input class="kirish-input" type="password" id="kirish-parol" placeholder="••••••••" onkeydown="if(event.key==='Enter')kirishTasdiqlash()">
+    <button class="kirish-btn" onclick="kirishTasdiqlash()">Kirish</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="wrap" id="admin-panel" style="display:none">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-nom">Yechim<span>24</span>.uz</div>
+      <div class="brand-sub">Admin panel</div>
+    </div>
+    <nav class="nav">
+      <a class="nav-item faol" onclick="sahifaOch('bosh',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Bosh sahifa
+      </a>
+      <a class="nav-item" onclick="sahifaOch('ustalar',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Ustalar
+      </a>
+      <a class="nav-item" onclick="sahifaOch('elonlar',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        E'lonlar
+      </a>
+      <a class="nav-item" onclick="sahifaOch('tolovlar',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        To'lovlar
+      </a>
+      <a class="nav-item" onclick="sahifaOch('foydalanuvchilar',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Foydalanuvchilar
+      </a>
+      <a class="nav-item" onclick="sahifaOch('sozlamalar',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Sozlamalar
+      </a>
+    </nav>
+    <div class="sidebar-pastki">
+      <div class="chiqish-btn" onclick="chiqish()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Chiqish
+      </div>
+    </div>
+  </div>
+
+  <!-- ASOSIY KONTENT -->
+  <div class="main">
+
+    <!-- BOSH SAHIFA -->
+    <div class="sahifa" id="s-bosh" style="display:block">
+      <div class="sahifa-sarlavha">Bosh sahifa</div>
+      <div class="stat-grid">
+        <div class="stat-karta">
+          <div class="stat-label">Jami ustalar</div>
+          <div class="stat-raqam" id="stat-ustalar">-</div>
+          <div class="stat-ozg osish">+12 bu oy</div>
+        </div>
+        <div class="stat-karta">
+          <div class="stat-label">Foydalanuvchilar</div>
+          <div class="stat-raqam" id="stat-foydalanuvchilar">-</div>
+          <div class="stat-ozg osish">+89 bu oy</div>
+        </div>
+        <div class="stat-karta">
+          <div class="stat-label">Faol e'lonlar</div>
+          <div class="stat-raqam" id="stat-elonlar">-</div>
+          <div class="stat-ozg osish">+5 bu hafta</div>
+        </div>
+        <div class="stat-karta">
+          <div class="stat-label">Jami buyurtmalar</div>
+          <div class="stat-raqam" id="stat-buyurtmalar">-</div>
+          <div class="stat-ozg osish">+34 bu oy</div>
+        </div>
+      </div>
+
+      <div class="grafik-grid">
+        <div class="grafik-karta">
+          <div class="grafik-sarlavha">Kategoriyalar bo'yicha ustalar</div>
+          <div class="bar-container">
+            <div class="bar-qator"><span class="bar-nom">Santexnik</span><div class="bar-wrap"><div class="bar-ich" style="width:65%"></div></div><span class="bar-val">162</span></div>
+            <div class="bar-qator"><span class="bar-nom">Elektrik</span><div class="bar-wrap"><div class="bar-ich" style="width:45%;background:#378ADD"></div></div><span class="bar-val">112</span></div>
+            <div class="bar-qator"><span class="bar-nom">Dasturchi</span><div class="bar-wrap"><div class="bar-ich" style="width:35%;background:#D4537E"></div></div><span class="bar-val">87</span></div>
+            <div class="bar-qator"><span class="bar-nom">Dizayner</span><div class="bar-wrap"><div class="bar-ich" style="width:28%;background:#BA7517"></div></div><span class="bar-val">70</span></div>
+            <div class="bar-qator"><span class="bar-nom">Muallim</span><div class="bar-wrap"><div class="bar-ich" style="width:22%;background:#7F77DD"></div></div><span class="bar-val">55</span></div>
+          </div>
+        </div>
+        <div class="grafik-karta">
+          <div class="grafik-sarlavha">To'lov holati</div>
+          <div class="donut-wrap">
+            <div class="donut-item"><span class="donut-rang" style="background:#0ABF6F"></span><span class="donut-nom">To'langan</span><span class="donut-foiz">68%</span></div>
+            <div class="donut-item"><span class="donut-rang" style="background:#FFB800"></span><span class="donut-nom">Kutilmoqda</span><span class="donut-foiz">22%</span></div>
+            <div class="donut-item"><span class="donut-rang" style="background:#E24B4A"></span><span class="donut-nom">Bekor qilindi</span><span class="donut-foiz">10%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="jadval-wrap">
+        <div class="jadval-top"><span class="jadval-nom">So'nggi buyurtmalar</span></div>
+        <table>
+          <thead><tr><th>Mijoz</th><th>Usta</th><th>Xizmat</th><th>Miqdor</th><th>Holat</th></tr></thead>
+          <tbody id="bosh-jadval"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USTALAR -->
+    <div class="sahifa" id="s-ustalar" style="display:none">
+      <div class="sahifa-sarlavha">Ustalar boshqaruvi</div>
+      <div class="jadval-wrap">
+        <div class="jadval-top">
+          <span class="jadval-nom">Barcha ustalar</span>
+          <input class="qidiruv-inp" placeholder="Usta qidirish..." oninput="ustalarQidirish(this.value)">
+        </div>
+        <table>
+          <thead><tr><th>Usta</th><th>Mutaxassislik</th><th>Reyting</th><th>Ishlar</th><th>Holat</th><th>Amallar</th></tr></thead>
+          <tbody id="ustalar-jadval"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- E'LONLAR -->
+    <div class="sahifa" id="s-elonlar" style="display:none">
+      <div class="sahifa-sarlavha">Ish e'lonlari</div>
+      <div class="jadval-wrap">
+        <div class="jadval-top"><span class="jadval-nom">Barcha e'lonlar</span></div>
+        <table>
+          <thead><tr><th>Sarlavha</th><th>Kategoriya</th><th>Byudjet</th><th>Takliflar</th><th>Holat</th><th>Amallar</th></tr></thead>
+          <tbody id="elonlar-jadval"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TO'LOVLAR -->
+    <div class="sahifa" id="s-tolovlar" style="display:none">
+      <div class="sahifa-sarlavha">To'lovlar tarixi</div>
+      <div class="jadval-wrap">
+        <div class="jadval-top"><span class="jadval-nom">Barcha to'lovlar</span></div>
+        <table>
+          <thead><tr><th>Buyurtma ID</th><th>Miqdor</th><th>Usul</th><th>Sana</th><th>Holat</th></tr></thead>
+          <tbody id="tolovlar-jadval"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FOYDALANUVCHILAR -->
+    <div class="sahifa" id="s-foydalanuvchilar" style="display:none">
+      <div class="sahifa-sarlavha">Foydalanuvchilar</div>
+      <div class="jadval-wrap">
+        <div class="jadval-top"><span class="jadval-nom">Barcha foydalanuvchilar</span></div>
+        <table>
+          <thead><tr><th>Ism</th><th>Telefon</th><th>Rol</th><th>Sana</th><th>Holat</th></tr></thead>
+          <tbody id="foydalanuvchilar-jadval"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SOZLAMALAR -->
+    <div class="sahifa" id="s-sozlamalar" style="display:none">
+      <div class="sahifa-sarlavha">Sozlamalar</div>
+      <div class="jadval-wrap" style="padding:24px">
+        <div class="sozlama-grup">
+          <div class="sozlama-nom">Komissiya foizi (%)</div>
+          <div class="sozlama-tavsif">Har bir buyurtmadan olinadigan komissiya miqdori</div>
+          <input class="sozlama-input" type="number" value="10" id="komissiya" style="width:150px">
+        </div>
+        <div class="sozlama-grup">
+          <div class="sozlama-nom">TOP obuna narxi (so'm/oy)</div>
+          <div class="sozlama-tavsif">Ustalar TOP ga chiqish uchun to'laydigan oylik narx</div>
+          <input class="sozlama-input" type="number" value="50000" id="obuna-narx" style="width:200px">
+        </div>
+        <div class="sozlama-grup">
+          <div class="sozlama-nom">Admin login</div>
+          <div class="sozlama-tavsif">Admin panelga kirish uchun foydalanuvchi nomi</div>
+          <input class="sozlama-input" type="text" value="admin" id="admin-login" style="width:200px">
+        </div>
+        <div class="sozlama-grup">
+          <div class="sozlama-nom">Admin parol</div>
+          <div class="sozlama-tavsif">Admin panelga kirish uchun parol</div>
+          <input class="sozlama-input" type="password" placeholder="Yangi parol" id="admin-parol" style="width:200px">
+        </div>
+        <button class="saqlash-btn" onclick="sozlamalarSaqlash()">Saqlashni saqlash</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = 'https://usta24.onrender.com';
+const ADMIN_LOGIN = localStorage.getItem('admin_login') || 'admin';
+const ADMIN_PAROL = localStorage.getItem('admin_parol') || 'admin123';
+
+// KIRISH
+function kirishTasdiqlash() {
+  const login = document.getElementById('kirish-login').value;
+  const parol = document.getElementById('kirish-parol').value;
+  if (login === ADMIN_LOGIN && parol === ADMIN_PAROL) {
+    document.getElementById('kirish-ekran').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'flex';
+    malumotlarniYukla();
+  } else {
+    document.getElementById('kirish-xato').style.display = 'block';
+  }
+}
+
+function chiqish() {
+  document.getElementById('kirish-ekran').style.display = 'flex';
+  document.getElementById('admin-panel').style.display = 'none';
+}
+
+// SAHIFA O'ZGARTIRISH
+function sahifaOch(nom, el) {
+  document.querySelectorAll('.sahifa').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('faol'));
+  document.getElementById('s-' + nom).style.display = 'block';
+  el.classList.add('faol');
+}
+
+// MA'LUMOTLARNI YUKLASH
+async function malumotlarniYukla() {
+  try {
+    const [ustalarRes, elonlarRes] = await Promise.all([
+      fetch(API + '/api/ustalar?limit=100'),
+      fetch(API + '/api/elonlar?limit=100'),
+    ]);
+    const ustalar = await ustalarRes.json();
+    const elonlar = await elonlarRes.json();
+
+    document.getElementById('stat-ustalar').textContent = ustalar.jami || 0;
+    document.getElementById('stat-elonlar').textContent = elonlar.jami || 0;
+    document.getElementById('stat-foydalanuvchilar').textContent = '-';
+    document.getElementById('stat-buyurtmalar').textContent = '-';
+
+    // Ustalar jadvali
+    const ustalarJadval = document.getElementById('ustalar-jadval');
+    ustalarJadval.innerHTML = (ustalar.malumotlar || []).map(u => `
+      <tr>
+        <td><span class="avatar">${u.ism ? u.ism.slice(0,2).toUpperCase() : 'NN'}</span>${u.ism || '-'}</td>
+        <td>${u.mutaxassislik || '-'}</td>
+        <td>⭐ ${parseFloat(u.reyting || 0).toFixed(1)}</td>
+        <td>${u.bajarilgan_ishlar || 0}</td>
+        <td><span class="badge ${u.mavjud ? 'b-yashil' : 'b-sariq'}">${u.mavjud ? 'Mavjud' : 'Band'}</span></td>
+        <td>
+          <button class="amal-btn qizil" onclick="ustaBloklash('${u.id}')">Bloklash</button>
+        </td>
+      </tr>`).join('');
+
+    // E'lonlar jadvali
+    const elonlarJadval = document.getElementById('elonlar-jadval');
+    elonlarJadval.innerHTML = (elonlar.malumotlar || []).map(e => `
+      <tr>
+        <td>${e.sarlavha || '-'}</td>
+        <td><span class="badge b-kovoq">${e.kategoriya || '-'}</span></td>
+        <td>${parseInt(e.byudjet || 0).toLocaleString('ru-RU')} som</td>
+        <td>${e.takliflar_soni || 0}</td>
+        <td><span class="badge ${e.holat === 'faol' ? 'b-yashil' : 'b-kulrang'}">${e.holat === 'faol' ? 'Faol' : 'Yopiq'}</span></td>
+        <td><button class="amal-btn qizil" onclick="elonOchirish('${e.id}', this)">Ochirish</button></td>
+      </tr>`).join('');
+
+    // Bosh sahifa jadvali
+    document.getElementById('bosh-jadval').innerHTML = `
+      <tr><td>Foydalanuvchi</td><td>Jasur Rahimov</td><td>Santexnik</td><td>120,000 som</td><td><span class="badge b-yashil">Bajarildi</span></td></tr>
+      <tr><td>Foydalanuvchi</td><td>Dilnoza Yusupova</td><td>Dasturchi</td><td>350,000 som</td><td><span class="badge b-sariq">Jarayonda</span></td></tr>
+      <tr><td>Foydalanuvchi</td><td>Otabek Mirzayev</td><td>Elektrik</td><td>150,000 som</td><td><span class="badge b-kulrang">Kutilmoqda</span></td></tr>`;
+
+    // To'lovlar jadvali
+    document.getElementById('tolovlar-jadval').innerHTML = `
+      <tr><td>#UB-10234</td><td>120,000 som</td><td>Click</td><td>19.05.2026</td><td><span class="badge b-yashil">Tolandi</span></td></tr>
+      <tr><td>#UB-10235</td><td>350,000 som</td><td>Click</td><td>19.05.2026</td><td><span class="badge b-sariq">Kutilmoqda</span></td></tr>
+      <tr><td>#UB-10236</td><td>280,000 som</td><td>Click</td><td>18.05.2026</td><td><span class="badge b-qizil">Bekor qilindi</span></td></tr>`;
+
+    // Foydalanuvchilar jadvali
+    document.getElementById('foydalanuvchilar-jadval').innerHTML = (ustalar.malumotlar || []).map(u => `
+      <tr>
+        <td><span class="avatar">${u.ism ? u.ism.slice(0,2).toUpperCase() : 'NN'}</span>${u.ism || '-'}</td>
+        <td>-</td>
+        <td><span class="badge b-yashil">Usta</span></td>
+        <td>19.05.2026</td>
+        <td><span class="badge b-yashil">Faol</span></td>
+      </tr>`).join('');
+
+  } catch (err) {
+    console.error('Xato:', err);
+  }
+}
+
+function ustalarQidirish(q) {
+  document.querySelectorAll('#ustalar-jadval tr').forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function ustaBloklash(id) {
+  if(confirm('Haqiqatan ham bu ustani bloklashni xohlaysizmi?')) {
+    bildirish('Usta bloklandi!');
+  }
+}
+
+function elonOchirish(id, btn) {
+  if(confirm('Haqiqatan ham bu elonni ochirmoqchimisiz?')) {
+    btn.closest('tr').remove();
+    bildirish("E'lon o'chirildi!");
+  }
+}
+
+function sozlamalarSaqlash() {
+  const login = document.getElementById('admin-login').value;
+  const parol = document.getElementById('admin-parol').value;
+  if(login) localStorage.setItem('admin_login', login);
+  if(parol) localStorage.setItem('admin_parol', parol);
+  bildirish('Sozlamalar saqlandi!');
+}
+
+function bildirish(matn) {
+  const el = document.getElementById('bildirish');
+  el.textContent = matn;
+  el.classList.add('korinadi');
+  setTimeout(() => el.classList.remove('korinadi'), 2500);
+}
+</script>
+</body>
+</html>
