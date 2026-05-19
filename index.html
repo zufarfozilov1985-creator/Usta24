@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="Usta24.uz — O'zbekistoning eng yaxshi ustalar va qurilish materiallari platformasi">
+<title>Usta24.uz — Usta toping</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --yashil: #0ABF6F;
+  --yashil-to: #08A35E;
+  --yashil-och: #E8FBF1;
+  --sariq: #FFB800;
+  --sariq-och: #FFF8E7;
+  --ko-mir: #1A1A2E;
+  --kulrang: #F5F6FA;
+  --chegara: #E8ECF2;
+  --matn: #2D3748;
+  --matn-och: #718096;
+  --oq: #FFFFFF;
+  --radius: 16px;
+  --radius-kichik: 10px;
+  --font-sarlavha: 'Unbounded', sans-serif;
+  --font-matn: 'Golos Text', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-matn);background:var(--kulrang);color:var(--matn);min-height:100vh;max-width:430px;margin:0 auto;position:relative;overflow-x:hidden}
+
+/* YUKLANISH */
+#yuklash{position:fixed;inset:0;background:var(--ko-mir);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.5s}
+#yuklash.yashirin{opacity:0;pointer-events:none}
+.yuklash-logo{font-family:var(--font-sarlavha);font-size:28px;color:var(--oq)}
+.yuklash-logo span{color:var(--yashil)}
+.yuklash-chiziq{width:120px;height:3px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;margin-top:32px}
+.yuklash-ich{height:100%;width:0%;background:var(--yashil);border-radius:2px;animation:yukla 1.5s ease forwards}
+@keyframes yukla{to{width:100%}}
+
+/* HEADER */
+.header{background:var(--oq);padding:14px 16px 10px;position:sticky;top:0;z-index:100;border-bottom:0.5px solid var(--chegara)}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.logo{font-family:var(--font-sarlavha);font-size:19px;color:var(--ko-mir)}
+.logo span{color:var(--yashil)}
+.header-ong{display:flex;align-items:center;gap:8px}
+.savat-btn{position:relative;width:36px;height:36px;border-radius:10px;background:var(--kulrang);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px}
+.savat-son{position:absolute;top:-4px;right:-4px;width:16px;height:16px;background:#E24B4A;border-radius:50%;font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.kirish-btn{padding:7px 14px;background:var(--yashil);color:var(--oq);border:none;border-radius:var(--radius-kichik);font-size:12px;font-weight:600;cursor:pointer}
+.qidiruv{position:relative}
+.q-input{width:100%;padding:10px 14px 10px 38px;background:var(--kulrang);border:1.5px solid transparent;border-radius:var(--radius-kichik);font-size:14px;color:var(--matn);outline:none;transition:all 0.2s;font-family:var(--font-matn)}
+.q-input:focus{border-color:var(--yashil);background:var(--oq)}
+.q-belgi{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px}
+
+/* ASOSIY TABLAR */
+.asosiy-tab-qator{display:flex;background:var(--oq);border-bottom:0.5px solid var(--chegara)}
+.a-tab{flex:1;padding:11px 0;text-align:center;font-size:13px;font-weight:600;color:var(--matn-och);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s}
+.a-tab.faol{color:var(--yashil);border-bottom-color:var(--yashil)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--ko-mir) 0%,#16213E 100%);padding:20px 16px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:var(--yashil);border-radius:50%;opacity:0.07}
+.hero-matn{font-family:var(--font-sarlavha);font-size:17px;color:var(--oq);margin-bottom:4px}
+.hero-kichik{font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:14px}
+.hero-sonlar{display:flex;gap:18px}
+.h-raqam{font-family:var(--font-sarlavha);font-size:16px;color:var(--yashil)}
+.h-matn{font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px}
+
+/* TOP PANEL */
+.top-panel{background:var(--oq);padding:10px 16px;border-bottom:0.5px solid var(--chegara)}
+.top-nom{font-size:11px;font-weight:600;color:var(--matn-och);margin-bottom:7px}
+.toggle-q{display:flex;background:var(--kulrang);border-radius:10px;padding:3px;gap:3px}
+.tgl{flex:1;padding:7px 4px;border:none;border-radius:8px;font-size:11px;font-weight:600;color:var(--matn-och);background:transparent;cursor:pointer;transition:all 0.2s}
+.tgl.faol{background:var(--oq);color:var(--yashil);box-shadow:0 2px 6px rgba(0,0,0,0.08)}
+.top-izoh{font-size:11px;color:var(--matn-och);margin-top:7px}
+
+/* KATEGORIYALAR */
+.katlar{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;background:var(--oq);border-bottom:0.5px solid var(--chegara);scrollbar-width:none}
+.katlar::-webkit-scrollbar{display:none}
+.kat{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:50px;cursor:pointer}
+.kat-d{width:44px;height:44px;border-radius:12px;background:var(--kulrang);border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.2s}
+.kat.faol .kat-d{background:var(--yashil-och);border-color:var(--yashil)}
+.kat-n{font-size:10px;color:var(--matn-och);font-weight:600;text-align:center}
+.kat.faol .kat-n{color:var(--yashil)}
+
+/* USTALAR */
+.ro-yxat{padding:10px 16px 90px}
+.usta-karta{background:var(--oq);border-radius:var(--radius);border:1.5px solid transparent;padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color 0.2s;animation:chiq 0.3s ease both}
+@keyframes chiq{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.usta-karta.top1{border-color:var(--sariq)}
+.usta-karta.top2{border-color:#C0C0C0}
+.usta-karta.top3{border-color:#CD7F32}
+.uk-yuqori{display:flex;gap:12px;margin-bottom:10px}
+.uk-avatar{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;position:relative}
+.holat-n{position:absolute;bottom:-2px;right:-2px;width:13px;height:13px;border-radius:50%;border:2px solid var(--oq)}
+.online{background:var(--yashil)}
+.band{background:var(--sariq)}
+.top-b{position:absolute;top:-5px;left:-5px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:1.5px solid var(--oq)}
+.tb1{background:var(--sariq)}
+.tb2{background:#C0C0C0}
+.tb3{background:#CD7F32}
+.uk-info{flex:1;min-width:0}
+.uk-ism{font-family:var(--font-sarlavha);font-size:14px;color:var(--ko-mir);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uk-tur{font-size:12px;color:var(--matn-och);margin-bottom:5px}
+.yulduz{color:var(--sariq);font-size:12px}
+.ball{font-size:12px;font-weight:700;color:var(--ko-mir)}
+.baho-s{font-size:11px;color:var(--matn-och)}
+.chiplar{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.chip{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.ch-y{background:var(--yashil-och);color:#085041}
+.ch-k{background:var(--kulrang);color:var(--matn-och)}
+.ch-p{background:var(--yashil);color:var(--oq)}
+.ch-s{background:var(--sariq-och);color:#7A5300}
+.uk-pastki{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--chegara)}
+.uk-narx{font-family:var(--font-sarlavha);font-size:13px;color:var(--yashil)}
+.uk-narx span{font-size:10px;color:var(--matn-och);font-family:var(--font-matn);font-weight:400}
+.yollash-btn{padding:9px 16px;background:var(--yashil);color:var(--oq);border:none;border-radius:var(--radius-kichik);font-size:12px;font-weight:700;cursor:pointer}
+
+/* MAHSULOTLAR */
+.mah-katlar{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;background:var(--oq);border-bottom:0.5px solid var(--chegara);scrollbar-width:none}
+.mah-katlar::-webkit-scrollbar{display:none}
+.m-kat{padding:6px 12px;border-radius:20px;border:1px solid var(--chegara);background:var(--oq);font-size:11px;font-weight:600;color:var(--matn-och);cursor:pointer;white-space:nowrap}
+.m-kat.faol{background:var(--yashil-och);border-color:var(--yashil);color:#085041}
+.mah-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:10px 16px 90px}
+.mah-karta{background:var(--oq);border-radius:var(--radius);border:1px solid var(--chegara);overflow:hidden;cursor:pointer}
+.mah-rasm{height:95px;display:flex;align-items:center;justify-content:center;font-size:38px}
+.mah-ich{padding:10px}
+.mah-nom{font-size:12px;font-weight:600;color:var(--ko-mir);margin-bottom:2px;line-height:1.3}
+.mah-dokon{font-size:10px;color:var(--matn-och);margin-bottom:5px}
+.mah-reyting{font-size:10px;color:var(--sariq);margin-bottom:6px}
+.mah-pastki{display:flex;align-items:center;justify-content:space-between}
+.mah-narx{font-size:12px;font-weight:700;color:var(--yashil)}
+.savat-qosh{width:28px;height:28px;background:var(--yashil-och);border:none;border-radius:8px;font-size:16px;cursor:pointer;color:var(--yashil);display:flex;align-items:center;justify-content:center;font-weight:700}
+
+/* TO'LOV MODAL */
+.modal-fon{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity 0.3s;backdrop-filter:blur(3px)}
+.modal-fon.ochiq{opacity:1;pointer-events:all}
+.modal-quti{background:var(--oq);border-radius:24px 24px 0 0;max-height:94vh;overflow-y:auto;transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.32,0.72,0,1)}
+.modal-fon.ochiq .modal-quti{transform:translateY(0)}
+.modal-tutqich{width:40px;height:4px;background:var(--chegara);border-radius:2px;margin:12px auto 0}
+.modal-ich{padding:16px 20px 32px}
+.modal-sarlav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-nom{font-family:var(--font-sarlavha);font-size:15px;color:var(--ko-mir)}
+.yop-btn{width:30px;height:30px;border-radius:50%;background:var(--kulrang);border:none;cursor:pointer;font-size:16px;color:var(--matn-och)}
+.tolov-usta{display:flex;align-items:center;gap:10px;background:var(--kulrang);border-radius:12px;padding:12px;margin-bottom:14px}
+.t-avatar{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.t-ism{font-size:13px;font-weight:600;color:var(--ko-mir)}
+.t-tur{font-size:11px;color:var(--matn-och)}
+.maydon-label{font-size:11px;font-weight:700;color:var(--matn-och);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:5px;display:block}
+.maydon-input{width:100%;padding:11px 14px;border:1.5px solid var(--chegara);border-radius:12px;font-size:14px;color:var(--matn);outline:none;font-family:var(--font-matn);margin-bottom:12px;transition:border-color 0.2s}
+.maydon-input:focus{border-color:var(--yashil)}
+.soatlar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.soat-btn{padding:9px 4px;border:1.5px solid var(--chegara);border-radius:10px;background:var(--oq);font-size:12px;font-weight:700;color:var(--matn);cursor:pointer;text-align:center;transition:all 0.2s}
+.soat-btn.faol{border-color:var(--yashil);background:var(--yashil-och);color:#085041}
+.jami-quti{background:var(--yashil-och);border:1.5px solid var(--yashil);border-radius:12px;padding:12px 14px;margin:14px 0;display:flex;justify-content:space-between;align-items:center}
+.jami-lab{font-size:12px;color:#085041;font-weight:600}
+.jami-sum{font-family:var(--font-sarlavha);font-size:18px;color:#085041}
+
+/* GOOGLE MAPS QISMI */
+.xarita-bo-lim{margin-bottom:14px}
+.xarita-sarlavha{font-size:11px;font-weight:700;color:var(--matn-och);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.xarita-sarlavha span{color:var(--yashil)}
+#xarita-konteyner{width:100%;height:200px;border-radius:12px;border:1.5px solid var(--chegara);overflow:hidden;position:relative;background:var(--kulrang)}
+.xarita-yuklanmoqda{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--matn-och);font-size:13px}
+.manzil-quti{display:flex;align-items:center;gap:8px;background:var(--kulrang);border-radius:10px;padding:10px 12px;margin-top:8px}
+.manzil-belgi{font-size:16px}
+.manzil-matn{font-size:13px;color:var(--ko-mir);flex:1}
+.manzil-ozgartir{font-size:11px;color:var(--yashil);font-weight:600;cursor:pointer;border:none;background:transparent;font-family:var(--font-matn)}
+.joylashuv-btn{width:100%;padding:10px;background:var(--ko-mir);color:var(--oq);border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font-matn)}
+
+/* CLICK TO'LOV */
+.click-bo-lim{border:1.5px solid var(--chegara);border-radius:14px;padding:14px;margin-bottom:14px}
+.click-bosh{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.click-icon{width:36px;height:36px;background:#00BFFF;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-sarlavha);font-size:11px;font-weight:700;color:#fff}
+.click-nom{font-size:13px;font-weight:600;color:var(--ko-mir)}
+.click-sub{font-size:11px;color:var(--matn-och)}
+.click-xavf{font-size:11px;color:var(--matn-och)}
+.tolov-btn{width:100%;padding:14px;background:#00BFFF;color:#fff;border:none;border-radius:12px;font-family:var(--font-sarlavha);font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s}
+.tolov-btn:active{transform:scale(0.98)}
+
+/* MUVAFFAQIYAT */
+.muvaffaq{display:none;text-align:center;padding:20px 0}
+.muvaffaq.ko{display:block}
+.mv-doira{width:70px;height:70px;background:var(--yashil-och);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:32px}
+.mv-nom{font-family:var(--font-sarlavha);font-size:16px;color:var(--ko-mir);margin-bottom:8px}
+.mv-sub{font-size:13px;color:var(--matn-och);line-height:1.5;margin-bottom:16px}
+.mv-btn{padding:12px 24px;background:var(--yashil);color:var(--oq);border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-matn)}
+
+/* OTP EKRANI */
+.otp-ekran{position:fixed;inset:0;background:var(--oq);z-index:500;display:flex;flex-direction:column;justify-content:center;padding:32px 24px;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.32,0.72,0,1)}
+.otp-ekran.ochiq{transform:translateX(0)}
+.otp-orqaga{display:flex;align-items:center;gap:6px;color:var(--yashil);font-weight:600;font-size:14px;cursor:pointer;margin-bottom:32px;background:none;border:none;padding:0;font-family:var(--font-matn)}
+.otp-sarlavha{font-family:var(--font-sarlavha);font-size:22px;color:var(--ko-mir);margin-bottom:8px}
+.otp-tavsif{font-size:14px;color:var(--matn-och);line-height:1.5;margin-bottom:28px}
+.tel-quti{position:relative;margin-bottom:12px}
+.tel-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;font-weight:700;color:var(--ko-mir)}
+.tel-input{width:100%;padding:14px 14px 14px 70px;border:2px solid var(--chegara);border-radius:12px;font-size:18px;font-weight:700;letter-spacing:2px;outline:none;font-family:var(--font-matn);transition:border-color 0.2s;color:var(--ko-mir)}
+.tel-input:focus{border-color:var(--yashil)}
+.kod-qator{display:flex;gap:8px;justify-content:center;margin-bottom:22px}
+.kod-inp{width:48px;height:56px;border:2px solid var(--chegara);border-radius:12px;font-size:22px;font-weight:700;text-align:center;outline:none;font-family:var(--font-sarlavha);transition:all 0.2s;color:var(--ko-mir)}
+.kod-inp:focus{border-color:var(--yashil);background:var(--yashil-och)}
+.davom-btn{width:100%;padding:15px;background:var(--yashil);color:var(--oq);border:none;border-radius:12px;font-family:var(--font-sarlavha);font-size:14px;font-weight:700;cursor:pointer}
+.davom-btn:disabled{opacity:0.5;cursor:not-allowed}
+
+/* TAGLIK */
+.taglik{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--oq);border-top:1px solid var(--chegara);display:flex;padding:8px 0;z-index:200}
+.tag-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;cursor:pointer;border:none;background:transparent}
+.tag-ico{font-size:22px;transition:transform 0.2s}
+.tag-n{font-size:10px;font-weight:600;color:var(--matn-och)}
+.tag-btn.faol .tag-n{color:var(--yashil)}
+.tag-btn.faol .tag-ico{transform:scale(1.1)}
+
+@media (prefers-color-scheme:dark){
+  body{background:#0F1117}
+  .header,.usta-karta,.modal-quti,.otp-ekran,.top-panel,.mah-karta{background:#1A1D27}
+  .usta-karta,.top-panel{border-color:#262A36}
+  .q-input{background:#262A36;color:#E2E8F0}
+  .kat-d{background:#262A36}
+  .taglik{background:#1A1D27;border-color:#262A36}
+  .uk-ism,.modal-nom,.mv-nom{color:#E2E8F0}
+  .soat-btn{background:#262A36;border-color:#363A4A;color:#A0AEC0}
+  .click-bo-lim{border-color:#363A4A}
+  .maydon-input{background:#262A36;border-color:#363A4A;color:#E2E8F0}
+  .tolov-usta,.manzil-quti{background:#262A36}
+  .tel-input,.kod-inp{background:#262A36;border-color:#363A4A;color:#E2E8F0}
+  #xarita-konteyner{border-color:#363A4A}
+  .asosiy-tab-qator{background:#1A1D27;border-color:#262A36}
+  .mah-katlar{background:#1A1D27;border-color:#262A36}
+  .katlar{background:#1A1D27;border-color:#262A36}
+}
+</style>
+</head>
+<body>
+
+<!-- YUKLANISH -->
+<div id="yuklash">
+  <div class="yuklash-logo">Usta<span>24</span>.uz</div>
+  <div style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:6px">Eng yaxshi ustalar bir joyda</div>
+  <div class="yuklash-chiziq"><div class="yuklash-ich"></div></div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-top">
+    <div class="logo">Usta<span>24</span>.uz</div>
+    <div class="header-ong">
+      <button class="savat-btn" id="savat-btn">🛒<span class="savat-son" id="savat-son" style="display:none">0</span></button>
+      <button class="kirish-btn" onclick="otpOch()">Kirish</button>
+    </div>
+  </div>
+  <div class="qidiruv">
+    <span class="q-belgi">🔍</span>
+    <input class="q-input" type="search" placeholder="Usta yoki mahsulot qidiring..." id="qidiruv-input" oninput="qidirish()">
+  </div>
+</header>
+
+<!-- ASOSIY TABLAR -->
+<div class="asosiy-tab-qator">
+  <div class="a-tab faol" id="tab-ustalar" onclick="tabTanla('ustalar')">👷 Ustalar</div>
+  <div class="a-tab" id="tab-mahsulotlar" onclick="tabTanla('mahsulotlar')">🏗️ Mahsulotlar</div>
+  <div class="a-tab" id="tab-elonlar" onclick="tabTanla('elonlar')">📋 E'lonlar</div>
+</div>
+
+<!-- USTALAR BO'LIMI -->
+<div id="ustalar-bo-lim">
+  <div class="hero">
+    <div class="hero-matn">Ishonchli usta toping</div>
+    <div class="hero-kichik">Minglab mutaxassislar bir joyda</div>
+    <div class="hero-sonlar">
+      <div><div class="h-raqam">2,400+</div><div class="h-matn">Faol usta</div></div>
+      <div><div class="h-raqam">18,500+</div><div class="h-matn">Bajarilgan ish</div></div>
+      <div><div class="h-raqam">98%</div><div class="h-matn">Muvaffaqiyat</div></div>
+    </div>
+  </div>
+  <div class="top-panel">
+    <div class="top-nom">👑 Top rejimi</div>
+    <div class="toggle-q">
+      <button class="tgl faol" id="t1" onclick="topTanla('reyting')">⭐ Reyting</button>
+      <button class="tgl" id="t2" onclick="topTanla('premium')">💎 Premium</button>
+      <button class="tgl" id="t3" onclick="topTanla('barchasi')">📋 Barchasi</button>
+    </div>
+    <div class="top-izoh" id="top-izoh">Reytingi eng yuqori ustalar ko'rsatilmoqda</div>
+  </div>
+  <div class="katlar">
+    <div class="kat faol" onclick="katTanla(this,'barchasi')"><div class="kat-d">🔍</div><div class="kat-n">Barchasi</div></div>
+    <div class="kat" onclick="katTanla(this,'santexnik')"><div class="kat-d">🔧</div><div class="kat-n">Santexnik</div></div>
+    <div class="kat" onclick="katTanla(this,'elektrik')"><div class="kat-d">⚡</div><div class="kat-n">Elektrik</div></div>
+    <div class="kat" onclick="katTanla(this,'dasturchi')"><div class="kat-d">💻</div><div class="kat-n">Dasturchi</div></div>
+    <div class="kat" onclick="katTanla(this,'dizayner')"><div class="kat-d">🎨</div><div class="kat-n">Dizayner</div></div>
+    <div class="kat" onclick="katTanla(this,'muallim')"><div class="kat-d">📚</div><div class="kat-n">Muallim</div></div>
+  </div>
+  <div class="ro-yxat" id="ustalar-ro-yxat"></div>
+</div>
+
+<!-- MAHSULOTLAR BO'LIMI -->
+<div id="mahsulotlar-bo-lim" style="display:none">
+  <div class="hero">
+    <div class="hero-matn">Qurilish materiallari</div>
+    <div class="hero-kichik">Ko'p do'konlar — eng yaxshi narxlar</div>
+    <div class="hero-sonlar">
+      <div><div class="h-raqam">150+</div><div class="h-matn">Do'kon</div></div>
+      <div><div class="h-raqam">5,000+</div><div class="h-matn">Mahsulot</div></div>
+      <div><div class="h-raqam">Click</div><div class="h-matn">To'lov</div></div>
+    </div>
+  </div>
+  <div class="mah-katlar">
+    <button class="m-kat faol" onclick="mahKat(this,'barchasi')">Barchasi</button>
+    <button class="m-kat" onclick="mahKat(this,'sement')">Sement</button>
+    <button class="m-kat" onclick="mahKat(this,'gisht')">G'isht</button>
+    <button class="m-kat" onclick="mahKat(this,'boyoq')">Bo'yoq</button>
+    <button class="m-kat" onclick="mahKat(this,'plitka')">Plitka</button>
+    <button class="m-kat" onclick="mahKat(this,'yog-och')">Yog'och</button>
+    <button class="m-kat" onclick="mahKat(this,'santexnika')">Santexnika</button>
+  </div>
+  <div class="mah-grid" id="mah-grid"></div>
+</div>
+
+
+<!-- ISH E'LONLARI BO'LIMI -->
+<div id="elonlar-bo-lim" style="display:none">
+  <div class="hero">
+    <div class="hero-matn">Ish e'lonlari</div>
+    <div class="hero-kichik">Mijozlar e'lonini ko'rib, taklif yuboring</div>
+    <div class="hero-sonlar">
+      <div><div class="h-raqam" id="elonlar-soni">0</div><div class="h-matn">Faol e'lon</div></div>
+      <div><div class="h-raqam">Bepul</div><div class="h-matn">E'lon berish</div></div>
+      <div><div class="h-raqam">Tez</div><div class="h-matn">Javob olish</div></div>
+    </div>
+  </div>
+  <div style="padding:10px 16px;background:var(--oq);border-bottom:0.5px solid var(--chegara);display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none" id="elon-filtirlar">
+      <button class="saralash-chip faol" onclick="elonFiltir(this,'barchasi')">Barchasi</button>
+      <button class="saralash-chip" onclick="elonFiltir(this,'santexnik')">Santexnik</button>
+      <button class="saralash-chip" onclick="elonFiltir(this,'elektrik')">Elektrik</button>
+      <button class="saralash-chip" onclick="elonFiltir(this,'dasturchi')">Dasturchi</button>
+      <button class="saralash-chip" onclick="elonFiltir(this,'dizayner')">Dizayner</button>
+    </div>
+    <button onclick="elonModalOch()" style="margin-left:8px;padding:7px 12px;background:var(--yashil);color:var(--oq);border:none;border-radius:var(--radius-kichik);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0">+ E'lon</button>
+  </div>
+  <div style="padding:10px 16px 90px" id="elonlar-ro-yxat">
+    <div style="text-align:center;padding:40px;color:var(--matn-och)">
+      <div style="font-size:36px;margin-bottom:8px">📋</div>
+      <div>E'lonlar yuklanmoqda...</div>
+    </div>
+  </div>
+</div>
+
+<!-- E'LON MODAL -->
+<div class="modal-fon" id="elon-modal" onclick="elonModalYop(event)">
+  <div class="modal-quti">
+    <div class="modal-tutqich"></div>
+    <div class="modal-ich">
+      <div class="modal-sarlav">
+        <span class="modal-nom">Yangi ish e'loni</span>
+        <button class="yop-btn" onclick="elonModalYop()">✕</button>
+      </div>
+      <div id="elon-forma">
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--yashil-och);color:#085041;margin-bottom:12px">✅ Bepul e'lon</div>
+        <label class="maydon-label">Sarlavha</label>
+        <input class="maydon-input" placeholder="Masalan: Uyda kran almashish kerak" id="e-sarlavha">
+        <label class="maydon-label">Kategoriya</label>
+        <select class="maydon-input" id="e-kat">
+          <option value="santexnik">Santexnik</option>
+          <option value="elektrik">Elektrik</option>
+          <option value="dasturchi">Dasturchi</option>
+          <option value="dizayner">Dizayner</option>
+          <option value="muallim">Muallim</option>
+          <option value="boshqa">Boshqa</option>
+        </select>
+        <label class="maydon-label">Tavsif</label>
+        <textarea class="maydon-input" style="height:80px;resize:none" placeholder="Muammo haqida batafsil yozing..." id="e-tavsif"></textarea>
+        <label class="maydon-label">Byudjet (som)</label>
+        <input class="maydon-input" type="number" placeholder="Masalan: 200000" id="e-byudjet">
+        <button onclick="elonJoylash()" style="width:100%;padding:13px;background:var(--yashil);color:var(--oq);border:none;border-radius:12px;font-family:var(--font-matn);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px">E'lonni joylash</button>
+        <div style="text-align:center">
+          <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--sariq-och);color:#7A5300">👑 TOP e'lon — 25,000 som (3x ko'proq taklif)</div>
+        </div>
+      </div>
+      <div id="elon-muvaffaq" style="display:none;text-align:center;padding:20px 0">
+        <div style="width:64px;height:64px;background:var(--yashil-och);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px">✅</div>
+        <div style="font-family:var(--font-sarlavha);font-size:16px;color:var(--ko-mir);margin-bottom:8px">E'lon joylashdi!</div>
+        <div style="font-size:13px;color:var(--matn-och);margin-bottom:16px">Ustalar e'loningizni ko'rishmoqda. Takliflar tez orada keladi.</div>
+        <button onclick="elonModalYop()" style="padding:10px 24px;background:var(--yashil);color:var(--oq);border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer">Yaxshi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAKLIF MODAL -->
+<div class="modal-fon" id="taklif-modal" onclick="taklifModalYop(event)">
+  <div class="modal-quti">
+    <div class="modal-tutqich"></div>
+    <div class="modal-ich">
+      <div class="modal-sarlav">
+        <span class="modal-nom">Taklifnoma yuborish</span>
+        <button class="yop-btn" onclick="taklifModalYop()">✕</button>
+      </div>
+      <div id="taklif-forma">
+        <div id="taklif-elon-info" style="background:var(--kulrang);border-radius:10px;padding:10px 12px;margin-bottom:14px">
+          <div id="t-elon-nom" style="font-size:13px;font-weight:600;color:var(--ko-mir);margin-bottom:2px"></div>
+          <div id="t-elon-kat" style="font-size:11px;color:var(--matn-och)"></div>
+        </div>
+        <label class="maydon-label">Xabaringiz</label>
+        <textarea class="maydon-input" style="height:90px;resize:none" placeholder="Mijozga ozingiz haqida yozing — tajriba, narx, kelish vaqti..." id="t-matn"></textarea>
+        <label class="maydon-label">Taklif narxi (som)</label>
+        <input class="maydon-input" type="number" placeholder="Masalan: 150000" id="t-narx">
+        <button onclick="taklifYuborish()" style="width:100%;padding:13px;background:var(--yashil);color:var(--oq);border:none;border-radius:12px;font-family:var(--font-matn);font-size:14px;font-weight:700;cursor:pointer">Taklifnoma yuborish</button>
+      </div>
+      <div id="taklif-muvaffaq" style="display:none;text-align:center;padding:20px 0">
+        <div style="width:64px;height:64px;background:var(--yashil-och);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px">📨</div>
+        <div style="font-family:var(--font-sarlavha);font-size:16px;color:var(--ko-mir);margin-bottom:8px">Taklifnoma yuborildi!</div>
+        <div style="font-size:13px;color:var(--matn-och);margin-bottom:16px">Mijoz taklifingizni ko'rib chiqadi va javob beradi.</div>
+        <button onclick="taklifModalYop()" style="padding:10px 24px;background:var(--yashil);color:var(--oq);border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer">Yaxshi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAGLIK -->
+<nav class="taglik">
+  <button class="tag-btn faol" onclick="tabTanla('ustalar')"><span class="tag-ico">🏠</span><span class="tag-n">Bosh</span></button>
+  <button class="tag-btn" onclick="tabTanla('mahsulotlar')"><span class="tag-ico">🏗️</span><span class="tag-n">Mahsulot</span></button>
+  <button class="tag-btn" onclick="tabTanla('elonlar')"><span class="tag-ico">📋</span><span class="tag-n">E'lonlar</span></button>
+  <button class="tag-btn" onclick="otpOch()"><span class="tag-ico">👤</span><span class="tag-n">Profil</span></button>
+</nav>
+
+<!-- TO'LOV MODAL (Google Maps bilan) -->
+<div class="modal-fon" id="tolov-modal" onclick="modalYop(event)">
+  <div class="modal-quti">
+    <div class="modal-tutqich"></div>
+    <div class="modal-ich">
+      <div class="modal-sarlav">
+        <span class="modal-nom">Xizmat uchun to'lov</span>
+        <button class="yop-btn" onclick="tolovYop()">✕</button>
+      </div>
+      <div id="tolov-ichki"></div>
+    </div>
+  </div>
+</div>
+
+<!-- OTP EKRANI -->
+<div class="otp-ekran" id="otp-ekran">
+  <button class="otp-orqaga" onclick="otpYop()">← Orqaga</button>
+  <div id="otp-1">
+    <div class="otp-sarlavha">Xush kelibsiz! 👋</div>
+    <div class="otp-tavsif">Telefon raqamingizni kiriting</div>
+    <div class="tel-quti">
+      <span class="tel-prefix">+998</span>
+      <input class="tel-input" type="tel" id="tel-raqam" maxlength="9" placeholder="90 123 45 67" oninput="telKiritildi(this)">
+    </div>
+    <button class="davom-btn" id="sms-btn" onclick="smsYuborish()" disabled>SMS kod olish</button>
+  </div>
+  <div id="otp-2" style="display:none">
+    <div class="otp-sarlavha">Kodni kiriting 📲</div>
+    <div class="otp-tavsif" id="otp-tel-matn">SMS yuborildi</div>
+    <div class="kod-qator">
+      <input class="kod-inp" maxlength="1" type="tel" oninput="kodKir(this,0)" onkeydown="kodOrq(this,event,0)" id="k0">
+      <input class="kod-inp" maxlength="1" type="tel" oninput="kodKir(this,1)" onkeydown="kodOrq(this,event,1)" id="k1">
+      <input class="kod-inp" maxlength="1" type="tel" oninput="kodKir(this,2)" onkeydown="kodOrq(this,event,2)" id="k2">
+      <input class="kod-inp" maxlength="1" type="tel" oninput="kodKir(this,3)" onkeydown="kodOrq(this,event,3)" id="k3">
+      <input class="kod-inp" maxlength="1" type="tel" oninput="kodKir(this,4)" onkeydown="kodOrq(this,event,4)" id="k4">
+      <input class="kod-inp" maxlength="1" type="tel" oninput="kodKir(this,5)" onkeydown="kodOrq(this,event,5)" id="k5">
+    </div>
+    <button class="davom-btn" id="kirish-btn" onclick="kirishTasdiqlash()" disabled>Kirish</button>
+  </div>
+</div>
+
+<!-- GOOGLE MAPS API -->
+<script>
+// API kalitni .env dan olamiz — real loyihada server orqali keladi
+const MAPS_API_KEY = 'GOOGLE_MAPS_API_KEY_PLACEHOLDER';
+
+// Google Maps skriptini yuklash
+function mapsYukla(apiKey) {
+  const script = document.createElement('script');
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=uz&region=UZ&callback=mapsYuklandi`;
+  script.async = true;
+  script.defer = true;
+  document.head.appendChild(script);
+}
+
+let xarita = null;
+let marker = null;
+let tanlanganManzil = null;
+let tanlanganLat = null;
+let tanlanganLng = null;
+
+window.mapsYuklandi = function() {
+  console.log('Google Maps yuklandi ✅');
+};
+
+function xaritaYarat(konteyner) {
+  // Toshkent markazi
+  const toshkent = { lat: 41.2995, lng: 69.2401 };
+  xarita = new google.maps.Map(konteyner, {
+    center: toshkent,
+    zoom: 13,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
+    zoomControl: true,
+    styles: [
+      { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
+    ]
+  });
+
+  marker = new google.maps.Marker({
+    map: xarita,
+    draggable: true,
+    title: 'Manzilingiz',
+    animation: google.maps.Animation.DROP,
+  });
+
+  // Xaritaga bosish — manzil belgilash
+  xarita.addListener('click', (e) => {
+    manzilBelgila(e.latLng.lat(), e.latLng.lng());
+  });
+
+  // Marker sudrab o'tkazish
+  marker.addListener('dragend', (e) => {
+    manzilBelgila(e.latLng.lat(), e.latLng.lng());
+  });
+
+  // GPS — joriy joylashuvni aniqlash
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        manzilBelgila(lat, lng);
+        xarita.setCenter({ lat, lng });
+        xarita.setZoom(16);
+      },
+      () => {
+        xarita.setCenter(toshkent);
+      }
+    );
+  }
+}
+
+function manzilBelgila(lat, lng) {
+  tanlanganLat = lat;
+  tanlanganLng = lng;
+  if(marker) marker.setLatLng([lat, lng]);
+  if(xarita) xarita.setView([lat, lng], 16);
+
+  // Teskari geokodlash — koordinatadan manzil olish
+  fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lng+'&format=json&accept-language=uz')
+    .then(r=>r.json())
+    .then(data=>{
+      tanlanganManzil=data.display_name||lat.toFixed(4)+', '+lng.toFixed(4);
+      const el=document.getElementById('manzil-matn');
+      if(el) el.textContent=tanlanganManzil;
+      if(marker) marker.bindPopup('📍 '+tanlanganManzil).openPopup();
+    })
+    .catch(()=>{
+      tanlanganManzil=lat.toFixed(4)+', '+lng.toFixed(4);
+      const el=document.getElementById('manzil-matn');
+      if(el) el.textContent=tanlanganManzil;
+    });
+}
+
+// Ma'lumotlar
+const USTALAR = [
+  {id:1,ism:"Jasur Rahimov",tur:"Santexnik",kat:"santexnik",yil:7,reyting:4.9,baho:214,ish:412,narx:120000,holat:"online",premium:true,emoji:"🔧",rang:"#E1F5EE",oylik:500000},
+  {id:2,ism:"Dilnoza Yusupova",tur:"Veb dasturchi",kat:"dasturchi",yil:4,reyting:4.8,baho:89,ish:156,narx:350000,holat:"online",premium:true,emoji:"💻",rang:"#E6F1FB",oylik:800000},
+  {id:3,ism:"Otabek Mirzayev",tur:"Elektrik usta",kat:"elektrik",yil:10,reyting:4.9,baho:341,ish:689,narx:150000,holat:"band",premium:false,emoji:"⚡",rang:"#FAEEDA",oylik:350000},
+  {id:4,ism:"Sarvinoz Qodirova",tur:"UI/UX Dizayner",kat:"dizayner",yil:5,reyting:5.0,baho:67,ish:134,narx:280000,holat:"online",premium:true,emoji:"🎨",rang:"#EEEDFE",oylik:700000},
+  {id:5,ism:"Bobur Xasanov",tur:"Muallim",kat:"muallim",yil:8,reyting:4.7,baho:156,ish:890,narx:80000,holat:"online",premium:false,emoji:"📚",rang:"#EAF3DE",oylik:200000},
+];
+
+const MAHSULOTLAR = [
+  {id:1,nom:"Portlandsement M400",dokon:"Qurilish Bozori",kat:"sement",narx:85000,birlik:"qop",reyting:4.8,emoji:"🏗️",rang:"#F1EFE8"},
+  {id:2,nom:"Keramik plitka 60x60",dokon:"Plitka Markazi",kat:"plitka",narx:45000,birlik:"m²",reyting:4.7,emoji:"⬜",rang:"#E6F1FB"},
+  {id:3,nom:"G'isht oddiy qizil",dokon:"Material Plus",kat:"gisht",narx:1200,birlik:"dona",reyting:4.6,emoji:"🧱",rang:"#FAECE7"},
+  {id:4,nom:"Tez quriydigan bo'yoq",dokon:"Bo'yoqLand",kat:"boyoq",narx:65000,birlik:"litr",reyting:4.9,emoji:"🪣",rang:"#FBEAF0"},
+  {id:5,nom:"Laminat taxta 8mm",dokon:"Yog'och Dunyo",kat:"yog-och",narx:38000,birlik:"m²",reyting:4.5,emoji:"🪵",rang:"#FAEEDA"},
+  {id:6,nom:"Plastik quvur 50mm",dokon:"SanTex Pro",kat:"santexnika",narx:12000,birlik:"metr",reyting:4.8,emoji:"🔩",rang:"#E1F5EE"},
+];
+
+let joriyRejim='reyting', joriyKat='barchasi', mahJoriyKat='barchasi';
+let tanUsta=null, tanSoat=1, savatSoni=0;
+
+function narxF(n){return n.toLocaleString('ru-RU')+' so\'m';}
+function yulduz(r){let s='';for(let i=1;i<=5;i++)s+=i<=Math.round(r)?'★':'☆';return s;}
+
+function tabTanla(tab){
+  ['ustalar','mahsulotlar','elonlar'].forEach(t=>{
+    const el=document.getElementById(t+'-bo-lim');
+    if(el) el.style.display='none';
+  });
+  const aktiv=document.getElementById(tab+'-bo-lim');
+  if(aktiv) aktiv.style.display='block';
+  document.querySelectorAll('.a-tab').forEach(t=>t.classList.remove('faol'));
+  const tabEl=document.getElementById('tab-'+tab);
+  if(tabEl) tabEl.classList.add('faol');
+  document.querySelectorAll('.tag-btn').forEach(t=>t.classList.remove('faol'));
+  const idx={ustalar:0,mahsulotlar:1,elonlar:2};
+  const tagBtnlar=document.querySelectorAll('.tag-btn');
+  if(tagBtnlar[idx[tab]]) tagBtnlar[idx[tab]].classList.add('faol');
+  if(tab==='elonlar') elonlarniYukla();
+}
+
+// E'LONLAR FUNKSIYALARI
+let joriyElonFiltir='barchasi';
+let taklifYuboriladiganElon=null;
+
+function elonFiltir(el,kat){
+  document.querySelectorAll('#elon-filtirlar button').forEach(b=>b.classList.remove('faol'));
+  el.classList.add('faol');
+  joriyElonFiltir=kat;
+  elonlarniYukla();
+}
+
+async function elonlarniYukla(){
+  const konteyner=document.getElementById('elonlar-ro-yxat');
+  konteyner.innerHTML='<div style="text-align:center;padding:40px;color:var(--matn-och)"><div style="font-size:36px;margin-bottom:8px">⏳</div><div>Yuklanmoqda...</div></div>';
+  try{
+    const url=joriyElonFiltir==='barchasi'?'/api/elonlar':`/api/elonlar?kategoriya=${joriyElonFiltir}`;
+    const r=await fetch('http://localhost:5000'+url);
+    const data=await r.json();
+    document.getElementById('elonlar-soni').textContent=data.jami;
+    if(!data.malumotlar.length){
+      konteyner.innerHTML='<div style="text-align:center;padding:40px;color:var(--matn-och)"><div style="font-size:36px;margin-bottom:8px">📋</div><div>Hali elon yoq</div><div style="font-size:12px;margin-top:8px">Birinchi boling!</div></div>';
+      return;
+    }
+    konteyner.innerHTML=data.malumotlar.map(e=>`
+      <div style="background:var(--oq);border-radius:var(--radius);border:1.5px solid ${e.top_elon?'var(--sariq)':'var(--chegara)'};padding:14px;margin-bottom:10px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+          <div style="flex:1">
+            <div style="font-family:var(--font-sarlavha);font-size:14px;color:var(--ko-mir);margin-bottom:4px">${e.sarlavha}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span style="padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:var(--yashil-och);color:#085041">${e.kategoriya}</span>
+              ${e.top_elon?'<span style="padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:var(--sariq-och);color:#7A5300">👑 TOP</span>':''}
+            </div>
+          </div>
+          <div style="width:28px;height:28px;border-radius:50%;background:#E6F1FB;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#0C447C;flex-shrink:0">${e.mijoz_ismi?e.mijoz_ismi.slice(0,2).toUpperCase():'??'}</div>
+        </div>
+        <div style="font-size:12px;color:var(--matn-och);line-height:1.5;margin-bottom:10px">${e.tavsif}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:11px;color:var(--matn-och)">
+          <span>💬 ${e.takliflar_soni} ta taklif</span>
+          <span>⏰ ${new Date(e.yaratildi).toLocaleDateString('uz-UZ')}</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--chegara)">
+          <div style="font-family:var(--font-sarlavha);font-size:13px;color:var(--yashil)">${parseInt(e.byudjet).toLocaleString('ru-RU')} som</div>
+          <button onclick="taklifModalOch('${e.id}','${e.sarlavha}','${e.kategoriya}',${e.byudjet})" style="padding:8px 16px;background:var(--yashil);color:var(--oq);border:none;border-radius:var(--radius-kichik);font-size:12px;font-weight:700;cursor:pointer">Taklif yuborish</button>
+        </div>
+      </div>`).join('');
+  }catch(err){
+    konteyner.innerHTML='<div style="text-align:center;padding:40px;color:var(--matn-och)"><div style="font-size:36px;margin-bottom:8px">⚠️</div><div>Yuklashda xato</div></div>';
+  }
+}
+
+function elonModalOch(){
+  document.getElementById('elon-modal').classList.add('ochiq');
+  document.getElementById('elon-forma').style.display='block';
+  document.getElementById('elon-muvaffaq').style.display='none';
+  document.body.style.overflow='hidden';
+}
+function elonModalYop(e){
+  if(!e||e.target===document.getElementById('elon-modal')){
+    document.getElementById('elon-modal').classList.remove('ochiq');
+    document.body.style.overflow='';
+  }
+}
+async function elonJoylash(){
+  const sarlavha=document.getElementById('e-sarlavha').value.trim();
+  const tavsif=document.getElementById('e-tavsif').value.trim();
+  const byudjet=document.getElementById('e-byudjet').value;
+  const kategoriya=document.getElementById('e-kat').value;
+  if(!sarlavha){document.getElementById('e-sarlavha').style.borderColor='#E24B4A';return;}
+  if(!tavsif){document.getElementById('e-tavsif').style.borderColor='#E24B4A';return;}
+  if(!byudjet){document.getElementById('e-byudjet').style.borderColor='#E24B4A';return;}
+  try{
+    const token=localStorage.getItem('token');
+    const r=await fetch('http://localhost:5000/api/elonlar',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({sarlavha,tavsif,byudjet:parseInt(byudjet),kategoriya,top_elon:false})
+    });
+    const data=await r.json();
+    if(data.muvaffaqiyat){
+      document.getElementById('elon-forma').style.display='none';
+      document.getElementById('elon-muvaffaq').style.display='block';
+      elonlarniYukla();
+    } else {
+      alert(data.xato||'Xato yuz berdi');
+    }
+  }catch(err){
+    alert('Server bilan ulanishda xato');
+  }
+}
+
+function taklifModalOch(id,sarlavha,kat,byudjet){
+  taklifYuboriladiganElon={id,sarlavha,kat,byudjet};
+  document.getElementById('t-elon-nom').textContent=sarlavha;
+  document.getElementById('t-elon-kat').textContent=kat+' · Byudjet: '+parseInt(byudjet).toLocaleString('ru-RU')+' som';
+  document.getElementById('taklif-forma').style.display='block';
+  document.getElementById('taklif-muvaffaq').style.display='none';
+  document.getElementById('taklif-modal').classList.add('ochiq');
+  document.body.style.overflow='hidden';
+}
+function taklifModalYop(e){
+  if(!e||e.target===document.getElementById('taklif-modal')){
+    document.getElementById('taklif-modal').classList.remove('ochiq');
+    document.body.style.overflow='';
+  }
+}
+async function taklifYuborish(){
+  const matn=document.getElementById('t-matn').value.trim();
+  const narx=document.getElementById('t-narx').value;
+  if(!matn){document.getElementById('t-matn').style.borderColor='#E24B4A';return;}
+  try{
+    const token=localStorage.getItem('token');
+    const r=await fetch(`http://localhost:5000/api/elonlar/${taklifYuboriladiganElon.id}/taklif`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({matn,taklif_narx:narx?parseInt(narx):null})
+    });
+    const data=await r.json();
+    if(data.muvaffaqiyat){
+      document.getElementById('taklif-forma').style.display='none';
+      document.getElementById('taklif-muvaffaq').style.display='block';
+      elonlarniYukla();
+    } else {
+      alert(data.xato||'Xato yuz berdi');
+    }
+  }catch(err){
+    alert('Tizimga kiring');
+  }
+}
+
+function topTanla(r){
+  joriyRejim=r;
+  ['t1','t2','t3'].forEach(id=>document.getElementById(id).classList.remove('faol'));
+  const izohlar={reyting:"Reytingi eng yuqori ustalar ko'rsatilmoqda",premium:"Oylik to'lov asosida TOP ustalar",barchasi:"Barcha mavjud ustalar"};
+  const idlar={reyting:'t1',premium:'t2',barchasi:'t3'};
+  document.getElementById(idlar[r]).classList.add('faol');
+  document.getElementById('top-izoh').textContent=izohlar[r];
+  ustaRender();
+}
+
+function katTanla(el,kat){
+  document.querySelectorAll('.kat').forEach(k=>k.classList.remove('faol'));
+  el.classList.add('faol');
+  joriyKat=kat;
+  ustaRender();
+}
+
+function mahKat(el,kat){
+  document.querySelectorAll('.m-kat').forEach(b=>b.classList.remove('faol'));
+  el.classList.add('faol');
+  mahJoriyKat=kat;
+  mahRender();
+}
+
+function qidirish(){ustaRender();mahRender();}
+
+function ustaRender(){
+  let list=[...USTALAR];
+  const q=document.getElementById('qidiruv-input').value.toLowerCase();
+  if(joriyKat!=='barchasi') list=list.filter(u=>u.kat===joriyKat);
+  if(q) list=list.filter(u=>u.ism.toLowerCase().includes(q)||u.tur.toLowerCase().includes(q));
+  if(joriyRejim==='reyting') list.sort((a,b)=>b.reyting-a.reyting);
+  else if(joriyRejim==='premium') list.sort((a,b)=>b.oylik-a.oylik);
+  const el=document.getElementById('ustalar-ro-yxat');
+  if(!list.length){
+    el.innerHTML='<div style="text-align:center;padding:48px 24px;color:var(--matn-och)"><div style="font-size:40px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:600;color:var(--matn)">Usta topilmadi</div></div>';
+    return;
+  }
+  el.innerHTML=list.map((u,i)=>{
+    const top=i<3&&joriyRejim!=='barchasi'?i+1:0;
+    const badge=top===1?'🥇':top===2?'🥈':top===3?'🥉':'';
+    return `<div class="usta-karta${top?' top'+top:''}" style="animation-delay:${i*0.05}s" onclick="tolovOch(${u.id})">
+      <div class="uk-yuqori">
+        <div class="uk-avatar" style="background:${u.rang}">
+          ${u.emoji}
+          <div class="holat-n ${u.holat}"></div>
+          ${badge?`<div class="top-b ${top===1?'tb1':top===2?'tb2':'tb3'}">${badge}</div>`:''}
+        </div>
+        <div class="uk-info">
+          <div class="uk-ism">${u.ism}</div>
+          <div class="uk-tur">${u.tur} · ${u.yil} yil tajriba</div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span class="yulduz">${yulduz(u.reyting)}</span>
+            <span class="ball">${u.reyting}</span>
+            <span class="baho-s">(${u.baho} ta baho)</span>
+          </div>
+        </div>
+      </div>
+      <div class="chiplar">
+        <span class="chip ${u.holat==='online'?'ch-y':'ch-k'}">${u.holat==='online'?'🟢 Hozir mavjud':'🟡 Band'}</span>
+        ${u.premium?'<span class="chip ch-p">💎 Premium</span>':''}
+        <span class="chip ch-k">✅ ${u.ish} ta ish</span>
+        ${joriyRejim==='premium'?`<span class="chip ch-s">💰 ${narxF(u.oylik)}/oy</span>`:''}
+      </div>
+      <div class="uk-pastki">
+        <div class="uk-narx">${narxF(u.narx)} <span>/ soat</span></div>
+        <button class="yollash-btn" onclick="event.stopPropagation();tolovOch(${u.id})">Yollash</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mahRender(){
+  let list=[...MAHSULOTLAR];
+  const q=document.getElementById('qidiruv-input').value.toLowerCase();
+  if(mahJoriyKat!=='barchasi') list=list.filter(m=>m.kat===mahJoriyKat);
+  if(q) list=list.filter(m=>m.nom.toLowerCase().includes(q)||m.dokon.toLowerCase().includes(q));
+  const el=document.getElementById('mah-grid');
+  if(!list.length){
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--matn-och);grid-column:1/-1"><div style="font-size:36px;margin-bottom:8px">🏗️</div><div>Mahsulot topilmadi</div></div>';
+    return;
+  }
+  el.innerHTML=list.map(m=>`
+    <div class="mah-karta">
+      <div class="mah-rasm" style="background:${m.rang}">${m.emoji}</div>
+      <div class="mah-ich">
+        <div class="mah-nom">${m.nom}</div>
+        <div class="mah-dokon">🏪 ${m.dokon}</div>
+        <div class="mah-reyting">${yulduz(m.reyting)} ${m.reyting}</div>
+        <div class="mah-pastki">
+          <div class="mah-narx">${narxF(m.narx)}<span style="font-size:10px;color:var(--matn-och);font-weight:400">/${m.birlik}</span></div>
+          <button class="savat-qosh" onclick="savatQosh()" aria-label="Savatga qo'shish">+</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function savatQosh(){
+  savatSoni++;
+  document.getElementById('savat-son').textContent=savatSoni;
+  document.getElementById('savat-son').style.display='flex';
+}
+
+// TO'LOV MODAL — Google Maps bilan
+function tolovOch(id){
+  tanUsta=USTALAR.find(u=>u.id===id);
+  if(!tanUsta) return;
+  tanSoat=1;
+  const u=tanUsta;
+
+  document.getElementById('tolov-ichki').innerHTML=`
+    <div class="tolov-usta">
+      <div class="t-avatar" style="background:${u.rang}">${u.emoji}</div>
+      <div>
+        <div class="t-ism">${u.ism}</div>
+        <div class="t-tur">${u.tur}</div>
+      </div>
+    </div>
+
+    <label class="maydon-label">Muammo tavsifi</label>
+    <input class="maydon-input" type="text" placeholder="Muammoni qisqacha yozing..." id="muammo-inp">
+
+    <label class="maydon-label">Necha soat kerak?</label>
+    <div class="soatlar">
+      ${[1,2,3,4].map(s=>`<button class="soat-btn${s===1?' faol':''}" onclick="soatTanla(this,${s})">${s} soat</button>`).join('')}
+    </div>
+
+    <div class="jami-quti">
+      <span class="jami-lab">Jami to'lov miqdori</span>
+      <span class="jami-sum" id="jami-sum">${narxF(u.narx)}</span>
+    </div>
+
+    <!-- GOOGLE MAPS MANZIL -->
+    <div class="xarita-bo-lim">
+      <div class="xarita-sarlavha">📍 <span>Manzilingizni belgilang</span></div>
+      <div id="xarita-konteyner">
+        <div class="xarita-yuklanmoqda" id="xarita-yuklanmoqda">
+          <div style="font-size:24px">🗺️</div>
+          <div>Xarita yuklanmoqda...</div>
+        </div>
+      </div>
+      <div class="manzil-quti">
+        <span class="manzil-belgi">📍</span>
+        <span class="manzil-matn" id="manzil-matn">Xaritadan manzil tanlang</span>
+        <button class="manzil-ozgartir" onclick="gpsniAniqla()">📡 GPS</button>
+      </div>
+      <button class="joylashuv-btn" onclick="gpsniAniqla()">
+        📡 Joriy joylashuvimni aniqlash
+      </button>
+    </div>
+
+    <div class="click-bo-lim">
+      <div class="click-bosh">
+        <div class="click-icon">CL</div>
+        <div>
+          <div class="click-nom">Click orqali to'lash</div>
+          <div class="click-sub">O'zbekistonning ishonchli to'lov tizimi</div>
+        </div>
+      </div>
+      <div class="click-xavf">🔒 Ma'lumotlaringiz xavfsiz va himoyalangan</div>
+    </div>
+
+    <div id="tolov-forma">
+      <button class="tolov-btn" onclick="clickTolov()">💳 Click bilan to'lash</button>
+    </div>
+
+    <div class="muvaffaq" id="muvaffaq">
+      <div class="mv-doira">✅</div>
+      <div class="mv-nom">To'lov muvaffaqiyatli!</div>
+      <div class="mv-sub">
+        Usta <strong>15 daqiqa</strong> ichida bog'lanadi.<br>
+        📍 Manzilingiz ustaga yuborildi.<br>
+        Buyurtma: <strong>#U24-${Math.floor(Math.random()*90000+10000)}</strong>
+      </div>
+      <button class="mv-btn" onclick="tolovYop()">Yaxshi, tushunarli</button>
+    </div>`;
+
+  document.getElementById('tolov-modal').classList.add('ochiq');
+  document.body.style.overflow='hidden';
+
+  // Google Maps ni yuklash
+  setTimeout(()=>{
+    const konteyner=document.getElementById('xarita-konteyner');
+    if(konteyner){
+      document.getElementById('xarita-yuklanmoqda').style.display='none';
+      if(xarita){xarita.remove();xarita=null;}
+      const toshkent=[41.2995,69.2401];
+      xarita=L.map(konteyner,{zoomControl:true}).setView(toshkent,13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'OpenStreetMap',maxZoom:19}).addTo(xarita);
+      marker=L.marker(toshkent,{draggable:true}).addTo(xarita);
+      xarita.on('click',(e)=>{manzilBelgila(e.latlng.lat,e.latlng.lng);});
+      marker.on('dragend',(e)=>{const p=e.target.getLatLng();manzilBelgila(p.lat,p.lng);});
+      if(navigator.geolocation){navigator.geolocation.getCurrentPosition((pos)=>{manzilBelgila(pos.coords.latitude,pos.coords.longitude);xarita.setView([pos.coords.latitude,pos.coords.longitude],16);},(()=>{}));}
+      setTimeout(()=>xarita.invalidateSize(),200);
+    }
+  }, 300);
+}
+
+function soatTanla(el,s){
+  tanSoat=s;
+  document.querySelectorAll('.soat-btn').forEach(b=>b.classList.remove('faol'));
+  el.classList.add('faol');
+  if(tanUsta) document.getElementById('jami-sum').textContent=narxF(tanUsta.narx*s);
+}
+
+function gpsniAniqla(){
+  if(!navigator.geolocation){
+    alert('Brauzeringiz GPS ni qo\'llab-quvvatlamaydi');
+    return;
+  }
+  const btn=document.querySelector('.joylashuv-btn');
+  if(btn){btn.textContent='⏳ Aniqlanmoqda...';btn.disabled=true;}
+  navigator.geolocation.getCurrentPosition(
+    (pos)=>{
+      const {latitude:lat,longitude:lng}=pos.coords;
+      if(xarita){
+        manzilBelgila(lat,lng);
+      }
+      if(btn){btn.textContent='📡 Joriy joylashuvimni aniqlash';btn.disabled=false;}
+    },
+    ()=>{
+      if(btn){btn.textContent='📡 Joriy joylashuvimni aniqlash';btn.disabled=false;}
+      alert('GPS aniqlanmadi. Xaritadan manzil tanlang.');
+    }
+  );
+}
+
+function clickTolov(){
+  const muammo=document.getElementById('muammo-inp')?.value.trim();
+  if(!muammo){
+    document.getElementById('muammo-inp').style.borderColor='#E24B4A';
+    document.getElementById('muammo-inp').focus();
+    setTimeout(()=>document.getElementById('muammo-inp').style.borderColor='',2000);
+    return;
+  }
+  if(!tanlanganManzil){
+    alert('Iltimos, xaritadan manzilingizni belgilang');
+    return;
+  }
+  const btn=document.querySelector('.tolov-btn');
+  btn.textContent='⏳ Jarayonda...';
+  btn.disabled=true;
+  // Real loyihada: await fetch('/api/tolov/yaratish', {...})
+  setTimeout(()=>{
+    document.getElementById('tolov-forma').style.display='none';
+    document.getElementById('muvaffaq').classList.add('ko');
+  },2000);
+}
+
+function modalYop(e){
+  if(e.target===document.getElementById('tolov-modal')) tolovYop();
+}
+function tolovYop(){
+  document.getElementById('tolov-modal').classList.remove('ochiq');
+  document.body.style.overflow='';
+  xarita=null;
+  marker=null;
+}
+
+// OTP
+function otpOch(){document.getElementById('otp-ekran').classList.add('ochiq');document.body.style.overflow='hidden';}
+function otpYop(){document.getElementById('otp-ekran').classList.remove('ochiq');document.body.style.overflow='';}
+function telKiritildi(inp){inp.value=inp.value.replace(/\D/g,'');document.getElementById('sms-btn').disabled=inp.value.length<9;}
+function smsYuborish(){
+  const tel=document.getElementById('tel-raqam').value;
+  document.getElementById('otp-1').style.display='none';
+  document.getElementById('otp-2').style.display='block';
+  document.getElementById('otp-tel-matn').innerHTML=`<strong>+998 ${tel}</strong> raqamiga kod yuborildi`;
+  document.getElementById('k0').focus();
+}
+function kodKir(inp,idx){
+  if(inp.value.length===1&&idx<5) document.getElementById('k'+(idx+1)).focus();
+  const kod=Array.from({length:6},(_,i)=>document.getElementById('k'+i).value).join('');
+  document.getElementById('kirish-btn').disabled=kod.length<6;
+}
+function kodOrq(inp,e,idx){if(e.key==='Backspace'&&inp.value===''&&idx>0) document.getElementById('k'+(idx-1)).focus();}
+function kirishTasdiqlash(){
+  const btn=document.getElementById('kirish-btn');
+  btn.textContent='⏳ Tekshirilmoqda...';btn.disabled=true;
+  setTimeout(()=>{
+    otpYop();
+    document.querySelector('.kirish-btn').textContent='👤 Profil';
+    document.querySelector('.kirish-btn').style.background='var(--yashil-och)';
+    document.querySelector('.kirish-btn').style.color='var(--yashil)';
+  },1500);
+}
+
+// Yuklanish
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('yuklash').classList.add('yashirin');
+    ustaRender();
+    mahRender();
+    // Google Maps yuklash
+    // Leaflet tayyor!
+  },1600);
+});
+</script>
+</body>
+</html>
