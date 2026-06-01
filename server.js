@@ -182,7 +182,7 @@ async function smsPomborish(telefon, kod) {
   if (!eskizToken) return false;
 
   try {
-    const matn = `Yechim24.uz kirish kodi: ${kod}\nKod 5 daqiqa amal qiladi. Hech kimga bermang!`;
+    const matn = `Bu Eskiz dan test`;
     const r = await axios.post('https://notify.eskiz.uz/api/message/sms/send', {
       mobile_phone: telefon.replace('+', ''),
       message: matn,
