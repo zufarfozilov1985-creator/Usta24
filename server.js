@@ -151,21 +151,7 @@ function uuidTekshir(id) {
 let eskizToken = process.env.ESKIZ_EMAIL === 'token' ? process.env.ESKIZ_PASSWORD : (process.env.ESKIZ_TOKEN || null);
 let tokenVaqti = process.env.ESKIZ_EMAIL === "token" ? Date.now() : 0;
 
-async function eskizTokenOlish() {
-  try {
-    const r = await axios.post('https://notify.eskiz.uz/api/auth/login', {
-      email:    process.env.ESKIZ_EMAIL,
-      password: process.env.ESKIZ_PASSWORD,
-    }, { timeout: 10000 });
-    eskizToken = r.data?.data?.token;
-    tokenVaqti = Date.now();
-    console.log('✅ Eskiz token yangilandi');
-    return eskizToken;
-  } catch (e) {
-    console.error('❌ Eskiz login xatosi:', e.response?.data || e.message);
-    return null;
-  }
-}
+async function eskizTokenOlish(){return null;}
 
 async function smsPomborish(telefon, kod) {
   // Development rejimida SMS yuborilmaydi
