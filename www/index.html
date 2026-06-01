@@ -996,11 +996,25 @@ function otpYop(){document.getElementById('otp-ekran').classList.remove('ochiq')
 function telKiritildi(inp){inp.value=inp.value.replace(/\D/g,'');document.getElementById('sms-btn').disabled=inp.value.length<9;}
 function smsYuborish(){
   const tel=document.getElementById('tel-raqam').value;
-  document.getElementById('otp-1').style.display='none';
-  document.getElementById('otp-2').style.display='block';
-  document.getElementById('otp-tel-matn').innerHTML=`<strong>+998 ${tel}</strong> raqamiga kod yuborildi`;
-  document.getElementById('k0').focus();
+  const btn=document.getElementById('sms-btn');
+  btn.textContent='⏳ Yuborilmoqda...';btn.disabled=true;
+  fetch('https://usta24.onrender.com/api/auth/sms-yuborish',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({telefon:'+998'+tel})
+  }).then(r=>r.json()).then(data=>{
+    if(data.muvaffaqiyat){
+      document.getElementById('otp-1').style.display='none';
+      document.getElementById('otp-2').style.display='block';
+      document.getElementById('otp-tel-matn').innerHTML=`<strong>+998 ${tel}</strong> raqamiga kod yuborildi`;
+      document.getElementById('k0').focus();
+    } else {
+      alert(data.xato||'Xato yuz berdi');
+      btn.textContent='SMS kod olish';btn.disabled=false;
+    }
+  }).catch(()=>{alert('Server bilan ulanishda xato');btn.textContent='SMS kod olish';btn.disabled=false;});
 }
+
 function kodKir(inp,idx){
   if(inp.value.length===1&&idx<5) document.getElementById('k'+(idx+1)).focus();
   const kod=Array.from({length:6},(_,i)=>document.getElementById('k'+i).value).join('');
