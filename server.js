@@ -815,8 +815,10 @@ app.listen(PORT, async () => {
     console.error('❌ PostgreSQL ulanmadi:', e.message);
   }
 
- if (IS_PROD && process.env.ESKIZ_EMAIL) {
+ if (IS_PROD && process.env.ESKIZ_EMAIL && process.env.ESKIZ_EMAIL !== 'token') {
     await eskizTokenOlish();
+  } else if (process.env.ESKIZ_EMAIL === 'token') {
+    console.log('Eskiz token tayyor');
   }
 });
 
