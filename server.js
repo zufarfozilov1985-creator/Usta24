@@ -175,7 +175,7 @@ async function smsPomborish(telefon, kod) {
   }
 
   // Token 23 soatdan eski bo'lsa yangilanadi
-  if (!eskizToken || (Date.now() - tokenVaqti) > 23 * 60 * 60 * 1000) {
+  if (process.env.ESKIZ_EMAIL !== "token" && (!eskizToken || (Date.now() - tokenVaqti) > 23 * 60 * 60 * 1000)) {
     await eskizTokenOlish();
   }
 
