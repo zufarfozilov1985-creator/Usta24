@@ -182,7 +182,7 @@ async function smsPomborish(telefon, kod) {
   if (!eskizToken) return false;
 
   try {
-    const matn = `Bu Eskiz dan test`;
+    const matn = `Yechim24.uz kirish kodi: ${kod}\nKod 5 daqiqa amal qiladi. Hech kimga bermang!`;
     const r = await axios.post('https://notify.eskiz.uz/api/message/sms/send', {
       mobile_phone: telefon.replace('+', ''),
       message: matn,
@@ -815,8 +815,7 @@ app.listen(PORT, async () => {
     console.error('❌ PostgreSQL ulanmadi:', e.message);
   }
 
-  // Eskiz tokenni oldindan olish
-  if (IS_PROD && process.env.ESKIZ_EMAIL && process.env.ESKIZ_EMAIL !== 'token') {
+ if (IS_PROD && process.env.ESKIZ_EMAIL) {
     await eskizTokenOlish();
   }
 });
