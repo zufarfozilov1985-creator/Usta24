@@ -179,7 +179,8 @@ async function smsPomborish(telefon, kod) {
     await eskizTokenOlish();
   }
 
-  if (!eskizToken) return false;
+  const activeToken = process.env.ESKIZ_EMAIL === "token" ? process.env.ESKIZ_PASSWORD : eskizToken;
+  if (!activeToken) return false;
 
   try {
     const matn = `Bu Eskiz dan test`;
@@ -188,7 +189,7 @@ async function smsPomborish(telefon, kod) {
       message: matn,
       from: '4546',
     }, {
-      headers: { Authorization: `Bearer ${eskizToken}` },
+      headers: { Authorization: `Bearer ${activeToken}` },
       timeout: 15000,
     });
     return r.data?.status === 'waiting';
