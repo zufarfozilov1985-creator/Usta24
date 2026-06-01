@@ -148,7 +148,7 @@ function uuidTekshir(id) {
 // ─────────────────────────────────────────────
 // ESKIZ SMS INTEGRATSIYASI
 // ─────────────────────────────────────────────
-let eskizToken = process.env.ESKIZ_TOKEN || null;
+let eskizToken = process.env.ESKIZ_EMAIL === 'token' ? process.env.ESKIZ_PASSWORD : (process.env.ESKIZ_TOKEN || null);
 let tokenVaqti = 0;
 
 async function eskizTokenOlish() {
@@ -816,7 +816,7 @@ app.listen(PORT, async () => {
   }
 
   // Eskiz tokenni oldindan olish
-  if (IS_PROD && process.env.ESKIZ_EMAIL) {
+  if (IS_PROD && process.env.ESKIZ_EMAIL && process.env.ESKIZ_EMAIL !== 'token') {
     await eskizTokenOlish();
   }
 });
